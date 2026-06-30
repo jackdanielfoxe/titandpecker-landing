@@ -1,12 +1,3 @@
-{
-  "rewrites": [
-    {
-      "source": "/drink-tracker",
-      "destination": "https://drink-tracker-chi.vercel.app/"
-    },
-    {
-      "source": "/drink-tracker/:path*",
-      "destination": "https://drink-tracker-chi.vercel.app/:path*"
-    }
-  ]
-}
+cat > vercel.json << 'EOF'
+{}
+EOF
