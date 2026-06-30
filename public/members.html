@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Members — Tit & Pecker</title>
+  <meta name="robots" content="noindex" />
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+  <link rel="shortcut icon" href="/favicon.ico" />
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    @font-face {
+      font-family: 'Big Caslon';
+      src: url('/fonts/BigCaslon.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink: #182B39;
+      --deep-blue: #135178;
+      --tan: #CDA065;
+      --bg: #FAF9F7;
+      --card: #FFFFFF;
+      --border: #E2E6E9;
+      --sky: #A4D6F7;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Loading screen ── */
+    #loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      font-size: 14px;
+      opacity: 0.5;
+    }
+
+    /* ── Auth screen ── */
+    #auth-screen {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 40px 20px;
+      text-align: center;
+    }
+
+    #auth-screen img.logo {
+      width: 72px;
+      margin-bottom: 20px;
+    }
+
+    .eyebrow {
+      font-size: 12px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--tan);
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    #auth-screen h1 {
+      font-family: 'Big Caslon', Georgia, serif;
+      font-size: clamp(32px, 6vw, 52px);
+      font-weight: 400;
+      color: var(--ink);
+      margin-bottom: 8px;
+    }
+
+    #auth-screen p.sub {
+      font-size: 15px;
+      opacity: 0.6;
+      margin-bottom: 36px;
+      max-width: 320px;
+    }
+
+    .google-btn {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 28px;
+      background: var(--deep-blue);
+      color: #fff;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s ease;
+    }
+
+    .google-btn:hover { background: #0e3d5a; }
+
+    .google-btn svg {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+
+    #denied {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 40px 20px;
+      text-align: center;
+    }
+
+    #denied img.logo { width: 60px; margin-bottom: 20px; }
+
+    #denied h2 {
+      font-family: 'Big Caslon', Georgia, serif;
+      font-size: 28px;
+      font-weight: 400;
+      margin-bottom: 10px;
+    }
+
+    #denied p {
+      font-size: 15px;
+      opacity: 0.6;
+      max-width: 320px;
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+
+    /* ── Members page ── */
+    #members-page {
+      display: none;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .members-header {
+      background: var(--ink);
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .members-header__brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .members-header img {
+      width: 36px;
+      height: auto;
+    }
+
+    .members-header__name {
+      font-family: 'Big Caslon', Georgia, serif;
+      font-size: 20px;
+      color: #fff;
+      font-weight: 400;
+    }
+
+    .members-header__right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .members-header__user {
+      font-size: 13px;
+      color: rgba(255,255,255,0.5);
+    }
+
+    .signout-btn {
+      background: none;
+      border: 1px solid rgba(255,255,255,0.2);
+      color: rgba(255,255,255,0.6);
+      font-size: 13px;
+      padding: 6px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.15s ease;
+    }
+
+    .signout-btn:hover {
+      border-color: rgba(255,255,255,0.5);
+      color: #fff;
+    }
+
+    .members-body {
+      flex: 1;
+      padding: 40px 24px 64px;
+      max-width: 680px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .welcome-block {
+      margin-bottom: 40px;
+    }
+
+    .welcome-block .eyebrow {
+      margin-bottom: 6px;
+    }
+
+    .welcome-block h2 {
+      font-family: 'Big Caslon', Georgia, serif;
+      font-size: clamp(28px, 5vw, 42px);
+      font-weight: 400;
+      color: var(--ink);
+      margin-bottom: 12px;
+    }
+
+    .welcome-block p {
+      font-size: 15px;
+      line-height: 1.7;
+      opacity: 0.7;
+      max-width: 480px;
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 32px 0;
+    }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      opacity: 0.4;
+      margin-bottom: 16px;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 22px;
+      text-decoration: none;
+      color: var(--ink);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .card:hover {
+      border-color: var(--tan);
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+
+    .card--featured {
+      border-color: var(--tan);
+      background: linear-gradient(135deg, #FBF4E8 0%, var(--card) 100%);
+    }
+
+    .card__icon { font-size: 28px; }
+
+    .card__title {
+      font-family: 'Big Caslon', Georgia, serif;
+      font-size: 20px;
+      font-weight: 400;
+    }
+
+    .card__desc {
+      font-size: 13px;
+      opacity: 0.6;
+      line-height: 1.5;
+    }
+
+    .card__arrow {
+      margin-top: 8px;
+      font-size: 13px;
+      color: var(--tan);
+      font-weight: 600;
+    }
+
+    .placeholder-card {
+      background: var(--card);
+      border: 1px dashed var(--border);
+      border-radius: 14px;
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      opacity: 0.5;
+    }
+
+    .placeholder-card__icon { font-size: 24px; }
+    .placeholder-card__title { font-size: 16px; font-weight: 600; }
+    .placeholder-card__desc { font-size: 13px; line-height: 1.5; }
+
+    .coming-soon {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      background: var(--border);
+      color: var(--ink);
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-top: 4px;
+      width: fit-content;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="loading">Loading…</div>
+
+  <!-- Auth screen -->
+  <div id="auth-screen">
+    <img src="/tp-logo.png" alt="Tit & Pecker" class="logo" />
+    <p class="eyebrow">Members Only</p>
+    <h1>Tit &amp; Pecker</h1>
+    <p class="sub">This area is for members only. Sign in with your Google account to continue.</p>
+    <button class="google-btn" id="google-signin-btn">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path fill="#fff" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+        <path fill="#fff" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+        <path fill="#fff" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
+        <path fill="#fff" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+      </svg>
+      Sign in with Google
+    </button>
+  </div>
+
+  <!-- Access denied -->
+  <div id="denied">
+    <img src="/tp-logo.png" alt="Tit & Pecker" class="logo" />
+    <h2>Not a member yet.</h2>
+    <p>Your application may still be under review, or you may have signed in with the wrong Google account.</p>
+    <a href="/" style="font-size:14px; color: var(--deep-blue);">← Back to home</a>
+  </div>
+
+  <!-- Members page -->
+  <div id="members-page">
+    <header class="members-header">
+      <div class="members-header__brand">
+        <img src="/tp-logo.png" alt="Tit & Pecker" />
+        <span class="members-header__name">Tit &amp; Pecker</span>
+      </div>
+      <div class="members-header__right">
+        <span class="members-header__user" id="user-email"></span>
+        <button class="signout-btn" id="signout-btn">Sign out</button>
+      </div>
+    </header>
+
+    <div class="members-body">
+      <div class="welcome-block">
+        <p class="eyebrow">Welcome back</p>
+        <h2 id="welcome-name">Good to see you.</h2>
+        <p>You're in the right place. Below you'll find everything the Tit &amp; Pecker has to offer its members.</p>
+      </div>
+
+      <div class="divider"></div>
+
+      <p class="section-label">Quick access</p>
+      <div class="card-grid">
+        <a href="https://drink.titandpecker.com" class="card card--featured">
+          <span class="card__icon">🍻</span>
+          <span class="card__title">Drink Tracker</span>
+          <span class="card__desc">Log your drinks, track your sessions, and see who's leading the leaderboard.</span>
+          <span class="card__arrow">Open →</span>
+        </a>
+      </div>
+
+      <div class="divider"></div>
+
+      <p class="section-label">Coming soon</p>
+      <div class="card-grid">
+        <div class="placeholder-card">
+          <span class="placeholder-card__icon">📅</span>
+          <span class="placeholder-card__title">Events</span>
+          <span class="placeholder-card__desc">Upcoming nights, tastings, and members-only gatherings.</span>
+          <span class="coming-soon">Coming soon</span>
+        </div>
+        <div class="placeholder-card">
+          <span class="placeholder-card__icon">🍷</span>
+          <span class="placeholder-card__title">The Menu</span>
+          <span class="placeholder-card__desc">What's on tap, what's in the cellar, and what's new.</span>
+          <span class="coming-soon">Coming soon</span>
+        </div>
+        <div class="placeholder-card">
+          <span class="placeholder-card__icon">📍</span>
+          <span class="placeholder-card__title">Find Us</span>
+          <span class="placeholder-card__desc">Location, opening hours, and how to get here.</span>
+          <span class="coming-soon">Coming soon</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://awwbqxntpzycxwnoqfff.supabase.co'
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF3d2JxeG50cHp5Y3h3bm9xZmZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI4NDc0ODcsImV4cCI6MjA5ODQyMzQ4N30.iHpJO3Dytf04HBjZDOU9sIt7s9xBN5xGyqAuW-o5k-E'
+
+    const { createClient } = supabase
+    const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+    const loading    = document.getElementById('loading')
+    const authScreen = document.getElementById('auth-screen')
+    const denied     = document.getElementById('denied')
+    const membersPage = document.getElementById('members-page')
+    const userEmail  = document.getElementById('user-email')
+    const welcomeName = document.getElementById('welcome-name')
+
+    function show(el) {
+      ;[loading, authScreen, denied, membersPage].forEach(e => e.style.display = 'none')
+      el.style.display = 'flex'
+    }
+
+    async function isApprovedMember(email) {
+      // Check against an approved_members table in this Supabase project.
+      // If the table doesn't exist yet, all signed-in Google users are let in
+      // (open mode) — add the table later to lock it down.
+      try {
+        const { data, error } = await sb
+          .from('approved_members')
+          .select('email')
+          .eq('email', email.toLowerCase())
+          .maybeSingle()
+        if (error && error.code === '42P01') {
+          // Table doesn't exist yet — open access for now
+          return true
+        }
+        return !!data
+      } catch {
+        return true // fail open during setup
+      }
+    }
+
+    async function handleSession(session) {
+      if (!session) {
+        show(authScreen)
+        return
+      }
+
+      const email = session.user.email
+      const name = session.user.user_metadata?.full_name || email.split('@')[0]
+
+      const approved = await isApprovedMember(email)
+      if (!approved) {
+        show(denied)
+        return
+      }
+
+      userEmail.textContent = email
+      welcomeName.textContent = `Good to see you, ${name.split(' ')[0]}.`
+      show(membersPage)
+    }
+
+    // Initial session check
+    sb.auth.getSession().then(({ data: { session } }) => {
+      handleSession(session)
+    })
+
+    // Auth state changes (sign in / sign out)
+    sb.auth.onAuthStateChange((_event, session) => {
+      handleSession(session)
+    })
+
+    // Google sign in
+    document.getElementById('google-signin-btn').addEventListener('click', async () => {
+      await sb.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: 'https://titandpecker.com/members'
+        }
+      })
+    })
+
+    // Sign out
+    document.getElementById('signout-btn').addEventListener('click', async () => {
+      await sb.auth.signOut()
+      show(authScreen)
+    })
+  </script>
+</body>
+</html>
