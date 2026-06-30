@@ -4,7 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tit & Pecker</title>
-  <meta name="description" content="Tit & Pecker — your local pub." />
+  <meta name="description" content="An exclusive members club." />
+  <meta name="robots" content="noindex" />
 
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
@@ -20,127 +21,98 @@
       font-display: swap;
     }
 
-    :root {
-      --color-bg: #FAF9F7;
-      --color-ink: #182B39;
-      --color-deep-blue: #135178;
-      --color-sky: #A4D6F7;
-      --color-tan: #CDA065;
-      --color-brown: #784E12;
-      --color-red: #D02627;
-      --font-display: 'Big Caslon', 'Times New Roman', Georgia, serif;
-      --font-body: 'Segoe UI', system-ui, sans-serif;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     html, body {
       height: 100%;
-      margin: 0;
+      background: #000;
     }
 
-    body {
-      background: var(--color-bg);
-      color: var(--color-ink);
-      font-family: var(--font-body);
-      -webkit-font-smoothing: antialiased;
+    .hero {
+      position: relative;
+      width: 100%;
+      height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      min-height: 100vh;
-      padding: 32px 20px;
       text-align: center;
+      padding: 24px;
+      overflow: hidden;
     }
 
-    .logo {
-      width: 120px;
-      height: auto;
-      margin-bottom: 24px;
+    .hero__bg {
+      position: absolute;
+      inset: 0;
+      background-image: url('/bar.jpg');
+      background-size: cover;
+      background-position: center;
+      filter: brightness(0.45);
+      z-index: 0;
     }
 
-    .eyebrow {
-      margin: 0 0 6px;
-      font-size: 13px;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      color: var(--color-tan);
-      font-weight: 700;
-    }
-
-    h1 {
-      margin: 0 0 12px;
-      font-family: var(--font-display);
-      font-weight: 400;
-      font-size: clamp(40px, 8vw, 64px);
-      letter-spacing: 0.01em;
-      color: var(--color-ink);
-    }
-
-    p.tagline {
-      margin: 0 0 36px;
-      font-size: 16px;
-      color: var(--color-ink);
-      opacity: 0.7;
-      max-width: 420px;
-    }
-
-    .actions {
+    .hero__content {
+      position: relative;
+      z-index: 1;
       display: flex;
       flex-direction: column;
-      gap: 14px;
-      width: 100%;
-      max-width: 320px;
+      align-items: center;
+      gap: 16px;
     }
 
-    .btn {
-      display: inline-block;
-      padding: 16px 24px;
-      border-radius: 14px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      font-size: 14px;
-      text-decoration: none;
-      transition: opacity 0.15s ease;
+    .hero__logo {
+      width: 80px;
+      height: auto;
+      margin-bottom: 8px;
     }
 
-    .btn:active {
-      opacity: 0.85;
+    .hero__eyebrow {
+      font-family: 'Big Caslon', Georgia, serif;
+      font-size: clamp(18px, 3vw, 28px);
+      color: #CDA065;
+      font-weight: 400;
+      letter-spacing: 0.02em;
     }
 
-    .btn--primary {
-      background: var(--color-deep-blue);
+    .hero__title {
+      font-family: 'Big Caslon', Georgia, serif;
+      font-size: clamp(56px, 10vw, 120px);
       color: #FFFFFF;
+      font-weight: 400;
+      letter-spacing: -0.01em;
+      line-height: 1;
     }
 
-    .btn--secondary {
-      background: transparent;
-      color: var(--color-ink);
-      border: 1px solid var(--color-ink);
-      opacity: 0.6;
+    .hero__btn {
+      display: inline-block;
+      margin-top: 16px;
+      padding: 18px 40px;
+      background: #135178;
+      color: #FFFFFF;
+      font-family: 'Big Caslon', Georgia, serif;
+      font-size: clamp(16px, 2vw, 20px);
+      font-weight: 400;
+      letter-spacing: 0.02em;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s ease;
     }
 
-    footer {
-      margin-top: 56px;
-      font-size: 12px;
-      opacity: 0.4;
+    .hero__btn:hover {
+      background: #0e3d5a;
     }
   </style>
 </head>
 <body>
-  <img src="/tp-logo.png" alt="Tit & Pecker logo" class="logo" />
-
-  <p class="eyebrow">Welcome to the</p>
-  <h1>Tit &amp; Pecker</h1>
-  <p class="tagline">Chris loves willies</p>
-
-  <div class="actions">
-    <a href="https://drink.titandpecker.com" class="btn btn--primary">Drink Tracker</a>
-  </div>
-
-  <footer>&copy; Tit &amp; Pecker</footer>
+  <section class="hero">
+    <div class="hero__bg"></div>
+    <div class="hero__content">
+      <img src="/tp-logo.png" alt="Tit & Pecker" class="hero__logo" />
+      <p class="hero__eyebrow">Welcome to the</p>
+      <h1 class="hero__title">Tit &amp; Pecker</h1>
+      <a href="/apply.html" class="hero__btn">Apply to become a Member</a>
+    </div>
+  </section>
 </body>
 </html>

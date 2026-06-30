@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Apply for Membership — Tit & Pecker</title>
+  <meta name="robots" content="noindex" />
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+  <link rel="shortcut icon" href="/favicon.ico" />
+
+  <style>
+    @font-face {
+      font-family: 'Big Caslon';
+      src: url('/fonts/BigCaslon.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink: #182B39;
+      --deep-blue: #135178;
+      --tan: #CDA065;
+      --bg: #FAF9F7;
+      --card: #FFFFFF;
+      --border: #E2E6E9;
+      --red: #D02627;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 48px 20px 64px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .back {
+      align-self: flex-start;
+      color: var(--ink);
+      text-decoration: none;
+      font-size: 14px;
+      opacity: 0.5;
+      margin-bottom: 32px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .back:hover { opacity: 0.8; }
+
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    header img {
+      width: 60px;
+      height: auto;
+      margin-bottom: 16px;
+    }
+
+    .eyebrow {
+      font-size: 12px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--tan);
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    h1 {
+      font-family: 'Big Caslon', Georgia, serif;
+      font-size: clamp(28px, 5vw, 44px);
+      font-weight: 400;
+      color: var(--ink);
+      letter-spacing: 0.01em;
+    }
+
+    .subtitle {
+      margin-top: 10px;
+      font-size: 15px;
+      opacity: 0.6;
+      max-width: 360px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.5;
+    }
+
+    form {
+      width: 100%;
+      max-width: 520px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    label {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      opacity: 0.7;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 13px 14px;
+      font-size: 16px;
+      font-family: inherit;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--card);
+      color: var(--ink);
+      appearance: none;
+      outline: none;
+      transition: border-color 0.15s ease;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--deep-blue);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 90px;
+    }
+
+    .btn {
+      padding: 16px;
+      background: var(--deep-blue);
+      color: #fff;
+      font-family: 'Big Caslon', Georgia, serif;
+      font-size: 18px;
+      font-weight: 400;
+      letter-spacing: 0.04em;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+      margin-top: 4px;
+    }
+
+    .btn:hover { background: #0e3d5a; }
+    .btn:disabled { opacity: 0.6; cursor: default; }
+
+    .success {
+      display: none;
+      text-align: center;
+      padding: 32px 20px;
+      max-width: 420px;
+    }
+
+    .success h2 {
+      font-family: 'Big Caslon', Georgia, serif;
+      font-size: 28px;
+      font-weight: 400;
+      margin-bottom: 12px;
+      color: var(--ink);
+    }
+
+    .success p {
+      font-size: 15px;
+      opacity: 0.7;
+      line-height: 1.6;
+    }
+
+    .note {
+      font-size: 12px;
+      opacity: 0.45;
+      text-align: center;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+
+  <a href="/" class="back">← Back</a>
+
+  <header>
+    <img src="/tp-logo.png" alt="Tit & Pecker logo" />
+    <p class="eyebrow">Membership Application</p>
+    <h1>Apply to Join</h1>
+    <p class="subtitle">Membership is by application only. We'll be in touch if you're a good fit.</p>
+  </header>
+
+  <form id="application-form" action="https://formspree.io/f/xbdvavap" method="POST">
+
+    <div class="field">
+      <label for="name">Full Name</label>
+      <input type="text" id="name" name="full_name" placeholder="Your full name" required />
+    </div>
+
+    <div class="field">
+      <label for="dob">Date of Birth</label>
+      <input type="date" id="dob" name="date_of_birth" required />
+    </div>
+
+    <div class="field">
+      <label for="phone">Phone Number</label>
+      <input type="tel" id="phone" name="phone" placeholder="+44 7700 000000" required />
+    </div>
+
+    <div class="field">
+      <label for="location">Town / City</label>
+      <input type="text" id="location" name="town_city" placeholder="Where are you based?" required />
+    </div>
+
+    <div class="field">
+      <label for="dietary">Dietary Requirements</label>
+      <input type="text" id="dietary" name="dietary_requirements" placeholder="None, vegetarian, vegan, allergies…" />
+    </div>
+
+    <div class="field">
+      <label for="drink">Drink of Choice</label>
+      <input type="text" id="drink" name="drink_of_choice" placeholder="What's your poison?" required />
+    </div>
+
+    <input type="hidden" name="_subject" value="New Tit & Pecker Membership Application" />
+    <input type="hidden" name="_replyto" value="titandpecker@gmail.com" />
+
+    <button type="submit" class="btn" id="submit-btn">Submit Application</button>
+
+    <p class="note">Your details will only be used for membership purposes.</p>
+
+  </form>
+
+  <div class="success" id="success-msg">
+    <h2>Application received.</h2>
+    <p>Thank you for applying. Membership is considered carefully — we'll be in touch if you make the cut.</p>
+  </div>
+
+  <script>
+    const form = document.getElementById('application-form')
+    const btn = document.getElementById('submit-btn')
+    const success = document.getElementById('success-msg')
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault()
+      btn.disabled = true
+      btn.textContent = 'Sending…'
+
+      const data = new FormData(form)
+      const res = await fetch(form.action, {
+        method: 'POST',
+        body: data,
+        headers: { 'Accept': 'application/json' }
+      })
+
+      if (res.ok) {
+        form.style.display = 'none'
+        success.style.display = 'block'
+      } else {
+        btn.disabled = false
+        btn.textContent = 'Submit Application'
+        alert('Something went wrong. Please try again.')
+      }
+    })
+  </script>
+
+</body>
+</html>
