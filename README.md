@@ -5,8 +5,7 @@ Plain HTML/CSS landing page with branding, logo, and favicon. No build step.
 ## File structure
 
 ```
-titandpecker-landing/
-├── vercel.json          # proxies /drink-tracker to the existing app
+titandpecker-landing/       # proxies /drink-tracker to the existing app
 └── public/
     ├── index.html
     ├── tp-logo.png
