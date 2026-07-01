@@ -744,25 +744,39 @@
       const fridgeItems = data.filter(i => i.section === 'fridge')
       const shelfItems = data.filter(i => i.section === 'shelf')
 
-      const categories = {}
-      fridgeItems.forEach(item => {
-        const cat = item.category || 'Other'
-        if (!categories[cat]) categories[cat] = []
-        categories[cat].push(item)
-      })
+      // Groups items by their category, preserving the order categories first
+      // appear in (which follows sort_order since data is already sorted).
+      function groupByCategory(items) {
+        const groups = {}
+        items.forEach(item => {
+          const cat = item.category || 'Other'
+          if (!groups[cat]) groups[cat] = []
+          groups[cat].push(item)
+        })
+        return groups
+      }
 
-      fridgeEl.innerHTML = Object.keys(categories).length
-        ? Object.keys(categories).map(cat => `
-            <div class="menu-category">
-              <p class="menu-category__label">${CATEGORY_ICONS[cat] || '🍹'} ${escapeHtml(cat)}</p>
-              <ul>${categories[cat].map(i => `<li>${escapeHtml(i.name)}</li>`).join('')}</ul>
-            </div>
-          `).join('')
-        : '<p class="bento-card__desc" style="color:rgba(255,255,255,0.5)">Nothing in the fridge yet.</p>'
+      // Renders a set of category groups as markup. If there's only one group
+      // and it's the default "Other" bucket (i.e. no categories were ever set),
+      // skip the category label so uncategorised lists still look clean.
+      function renderGroups(groups, emptyMessage) {
+        const keys = Object.keys(groups)
+        if (!keys.length) {
+          return `<p class="bento-card__desc" style="color:rgba(255,255,255,0.5)">${emptyMessage}</p>`
+        }
+        if (keys.length === 1 && keys[0] === 'Other') {
+          return `<div class="menu-category"><ul>${groups['Other'].map(i => `<li>${escapeHtml(i.name)}</li>`).join('')}</ul></div>`
+        }
+        return keys.map(cat => `
+          <div class="menu-category">
+            <p class="menu-category__label">${CATEGORY_ICONS[cat] || '🍹'} ${escapeHtml(cat)}</p>
+            <ul>${groups[cat].map(i => `<li>${escapeHtml(i.name)}</li>`).join('')}</ul>
+          </div>
+        `).join('')
+      }
 
-      shelfEl.innerHTML = shelfItems.length
-        ? `<div class="menu-category"><ul>${shelfItems.map(i => `<li>${escapeHtml(i.name)}</li>`).join('')}</ul></div>`
-        : '<p class="bento-card__desc" style="color:rgba(255,255,255,0.5)">Nothing on the shelf yet.</p>'
+      fridgeEl.innerHTML = renderGroups(groupByCategory(fridgeItems), 'Nothing in the fridge yet.')
+      shelfEl.innerHTML = renderGroups(groupByCategory(shelfItems), 'Nothing on the shelf yet.')
     }
 
     // Parses free-text times like "6:00 PM", "18:00", "6pm" into { hours, minutes } 24h, or null.
