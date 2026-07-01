@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin — Tit & Pecker</title>
+  <meta name="robots" content="noindex" />
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+  <link rel="shortcut icon" href="/favicon.ico" />
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    @font-face {
+      font-family: 'Big Caslon';
+      src: url('/fonts/BigCaslon.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink: #182B39;
+      --deep-blue: #135178;
+      --tan: #CDA065;
+      --bg: #FAF9F7;
+      --card: #FFFFFF;
+      --border: #E2E6E9;
+      --red: #C0392B;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    #loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      font-size: 14px;
+      opacity: 0.5;
+    }
+
+    #auth-screen, #denied {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 40px 20px;
+      text-align: center;
+    }
+
+    #auth-screen img.logo, #denied img.logo {
+      width: 64px;
+      margin-bottom: 20px;
+    }
+
+    .eyebrow {
+      font-size: 12px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--tan);
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    #auth-screen h1, #denied h2 {
+      font-family: 'Big Caslon', Georgia, serif;
+      font-size: clamp(28px, 6vw, 44px);
+      font-weight: 400;
+      color: var(--ink);
+      margin-bottom: 8px;
+    }
+
+    #auth-screen p.sub, #denied p {
+      font-size: 15px;
+      opacity: 0.6;
+      margin-bottom: 28px;
+      max-width: 320px;
+      line-height: 1.6;
+    }
+
+    .google-btn {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 28px;
+      background: var(--deep-blue);
+      color: #fff;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s ease;
+    }
+
+    .google-btn:hover { background: #0e3d5a; }
+    .google-btn svg { width: 20px; height: 20px; flex-shrink: 0; }
+
+    #admin-page {
+      display: none;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .admin-header {
+      background: var(--ink);
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .admin-header__brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .admin-header img { width: 36px; height: auto; }
+
+    .admin-header__name {
+      font-family: 'Big Caslon', Georgia, serif;
+      font-size: 20px;
+      color: #fff;
+      font-weight: 400;
+    }
+
+    .admin-header__right { display: flex; align-items: center; gap: 16px; }
+
+    .admin-header__right a {
+      font-size: 13px;
+      color: rgba(255,255,255,0.6);
+      text-decoration: none;
+    }
+
+    .signout-btn {
+      background: none;
+      border: 1px solid rgba(255,255,255,0.2);
+      color: rgba(255,255,255,0.6);
+      font-size: 13px;
+      padding: 6px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.15s ease;
+    }
+
+    .signout-btn:hover { border-color: rgba(255,255,255,0.5); color: #fff; }
+
+    .admin-body {
+      flex: 1;
+      padding: 40px 24px 64px;
+      max-width: 680px;
+      margin: 0 auto;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+    }
+
+    .admin-section h2 {
+      font-family: 'Big Caslon', Georgia, serif;
+      font-size: 26px;
+      font-weight: 400;
+      margin-bottom: 4px;
+    }
+
+    .admin-section p.section-sub {
+      font-size: 14px;
+      opacity: 0.6;
+      margin-bottom: 20px;
+    }
+
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 22px;
+    }
+
+    .panel + .panel { margin-top: 16px; }
+
+    .field-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      flex: 1;
+      min-width: 140px;
+    }
+
+    label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      opacity: 0.6;
+    }
+
+    input, select, textarea {
+      padding: 10px 12px;
+      font-size: 14px;
+      font-family: inherit;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg);
+      color: var(--ink);
+      outline: none;
+    }
+
+    input:focus, select:focus, textarea:focus { border-color: var(--deep-blue); }
+
+    textarea { resize: vertical; min-height: 70px; }
+
+    .btn {
+      padding: 10px 20px;
+      background: var(--deep-blue);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+
+    .btn:hover { background: #0e3d5a; }
+    .btn:disabled { opacity: 0.5; cursor: default; }
+
+    .btn--secondary {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--ink);
+    }
+
+    .btn--secondary:hover { border-color: var(--tan); background: none; }
+
+    .item-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .item-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    .item-row__meta { opacity: 0.55; font-size: 12px; margin-left: 8px; }
+
+    .item-row__actions { display: flex; gap: 6px; }
+
+    .item-row__actions button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 13px;
+      color: var(--deep-blue);
+      font-weight: 600;
+    }
+
+    .item-row__actions button.delete { color: var(--red); }
+
+    .empty-note { font-size: 13px; opacity: 0.5; padding: 8px 0; }
+
+    .save-status {
+      font-size: 13px;
+      margin-left: 12px;
+      opacity: 0.7;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="loading">Loading…</div>
+
+  <div id="auth-screen">
+    <img src="/tp-logo.png" alt="Tit & Pecker" class="logo" />
+    <p class="eyebrow">Admin</p>
+    <h1>Tit &amp; Pecker</h1>
+    <p class="sub">Sign in with the club's Google account to manage the site.</p>
+    <button class="google-btn" id="google-signin-btn">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path fill="#fff" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+        <path fill="#fff" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+        <path fill="#fff" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
+        <path fill="#fff" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+      </svg>
+      Sign in with Google
+    </button>
+  </div>
+
+  <div id="denied">
+    <img src="/tp-logo.png" alt="Tit & Pecker" class="logo" />
+    <h2>Not an admin account.</h2>
+    <p>This page is restricted to the club's admin Google account. If that's you, make sure you're signed in with the right account.</p>
+    <a href="/members" style="font-size:14px; color: var(--deep-blue);">← Back to members area</a>
+  </div>
+
+  <div id="admin-page">
+    <header class="admin-header">
+      <div class="admin-header__brand">
+        <img src="/tp-logo.png" alt="Tit & Pecker" />
+        <span class="admin-header__name">Admin</span>
+      </div>
+      <div class="admin-header__right">
+        <a href="/members">← Members area</a>
+        <button class="signout-btn" id="signout-btn">Sign out</button>
+      </div>
+    </header>
+
+    <div class="admin-body">
+
+      <section class="admin-section">
+        <h2>Next Event</h2>
+        <p class="section-sub">This is the single event shown in the Events card on the members page. Saving overwrites whatever was there before.</p>
+        <div class="panel">
+          <div class="field-row">
+            <div class="field">
+              <label for="ev-title">Title</label>
+              <input type="text" id="ev-title" placeholder="e.g. 4th of July Party" />
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label for="ev-date">Date</label>
+              <input type="date" id="ev-date" />
+            </div>
+            <div class="field">
+              <label for="ev-time">Start time</label>
+              <input type="text" id="ev-time" placeholder="e.g. 6:00 PM" />
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label for="ev-menu">On the menu (optional)</label>
+              <input type="text" id="ev-menu" placeholder="e.g. Brisket" />
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label for="ev-desc">Description</label>
+              <textarea id="ev-desc" placeholder="A line or two about the event"></textarea>
+            </div>
+          </div>
+          <button class="btn" id="ev-save-btn">Save event</button>
+          <button class="btn btn--secondary" id="ev-clear-btn" type="button">Clear (show "coming soon")</button>
+          <span class="save-status" id="ev-status"></span>
+        </div>
+      </section>
+
+      <section class="admin-section">
+        <h2>Drinks Menu</h2>
+        <p class="section-sub">Add, edit, or remove items shown in the Drinks Menu card.</p>
+        <div class="panel">
+          <div class="field-row">
+            <div class="field">
+              <label for="mi-section">Section</label>
+              <select id="mi-section">
+                <option value="fridge">In the Fridge</option>
+                <option value="shelf">On the Shelf</option>
+              </select>
+            </div>
+            <div class="field" id="mi-category-field">
+              <label for="mi-category">Category</label>
+              <input type="text" id="mi-category" placeholder="e.g. Bottles, Cans, Soft Drinks" />
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label for="mi-name">Item name</label>
+              <input type="text" id="mi-name" placeholder="e.g. Estrella" />
+            </div>
+            <div class="field" style="max-width:110px;">
+              <label for="mi-sort">Sort order</label>
+              <input type="number" id="mi-sort" value="0" />
+            </div>
+          </div>
+          <button class="btn" id="mi-save-btn">Add item</button>
+          <button class="btn btn--secondary" id="mi-cancel-btn" type="button" style="display:none;">Cancel edit</button>
+          <span class="save-status" id="mi-status"></span>
+
+          <div class="item-list" id="mi-list"></div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://awwbqxntpzycxwnoqfff.supabase.co'
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF3d2JxeG50cHp5Y3h3bm9xZmZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI4NDc0ODcsImV4cCI6MjA5ODQyMzQ4N30.iHpJO3Dytf04HBjZDOU9sIt7s9xBN5xGyqAuW-o5k-E'
+    const ADMIN_EMAIL = 'titandpecker@gmail.com'
+
+    const { createClient } = supabase
+    const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+    const loading    = document.getElementById('loading')
+    const authScreen = document.getElementById('auth-screen')
+    const denied     = document.getElementById('denied')
+    const adminPage  = document.getElementById('admin-page')
+
+    function show(el) {
+      ;[loading, authScreen, denied, adminPage].forEach(e => e.style.display = 'none')
+      el.style.display = 'flex'
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement('div')
+      div.textContent = str ?? ''
+      return div.innerHTML
+    }
+
+    async function handleSession(session) {
+      if (!session) {
+        show(authScreen)
+        return
+      }
+      const email = session.user.email
+      if (email.toLowerCase() !== ADMIN_EMAIL) {
+        show(denied)
+        return
+      }
+      show(adminPage)
+      loadEventForm()
+      loadMenuItems()
+    }
+
+    sb.auth.getSession().then(({ data: { session } }) => handleSession(session))
+    sb.auth.onAuthStateChange((_event, session) => handleSession(session))
+
+    document.getElementById('google-signin-btn').addEventListener('click', async () => {
+      await sb.auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo: 'https://titandpecker.com/admin' }
+      })
+    })
+
+    document.getElementById('signout-btn').addEventListener('click', async () => {
+      await sb.auth.signOut()
+      show(authScreen)
+    })
+
+    // ── Next Event ──
+    async function loadEventForm() {
+      const { data } = await sb.from('next_event').select('*').eq('id', 1).maybeSingle()
+      if (!data) return
+      document.getElementById('ev-title').value = data.title || ''
+      document.getElementById('ev-date').value = data.event_date || ''
+      document.getElementById('ev-time').value = data.start_time || ''
+      document.getElementById('ev-menu').value = data.menu_note || ''
+      document.getElementById('ev-desc').value = data.description || ''
+    }
+
+    document.getElementById('ev-save-btn').addEventListener('click', async () => {
+      const status = document.getElementById('ev-status')
+      status.textContent = 'Saving…'
+      const { error } = await sb.from('next_event').update({
+        title: document.getElementById('ev-title').value.trim(),
+        event_date: document.getElementById('ev-date').value || null,
+        start_time: document.getElementById('ev-time').value.trim(),
+        menu_note: document.getElementById('ev-menu').value.trim(),
+        description: document.getElementById('ev-desc').value.trim(),
+        updated_at: new Date().toISOString()
+      }).eq('id', 1)
+      status.textContent = error ? 'Failed to save.' : 'Saved.'
+      if (error) console.error(error)
+      setTimeout(() => status.textContent = '', 2500)
+    })
+
+    document.getElementById('ev-clear-btn').addEventListener('click', async () => {
+      const status = document.getElementById('ev-status')
+      status.textContent = 'Clearing…'
+      const { error } = await sb.from('next_event').update({
+        title: null, event_date: null, start_time: null, menu_note: null, description: null,
+        updated_at: new Date().toISOString()
+      }).eq('id', 1)
+      if (!error) {
+        document.getElementById('ev-title').value = ''
+        document.getElementById('ev-date').value = ''
+        document.getElementById('ev-time').value = ''
+        document.getElementById('ev-menu').value = ''
+        document.getElementById('ev-desc').value = ''
+      }
+      status.textContent = error ? 'Failed to clear.' : 'Cleared.'
+      setTimeout(() => status.textContent = '', 2500)
+    })
+
+    // ── Drinks Menu ──
+    let editingId = null
+
+    async function loadMenuItems() {
+      const list = document.getElementById('mi-list')
+      const { data, error } = await sb.from('menu_items').select('*').order('section').order('sort_order')
+      if (error || !data) {
+        list.innerHTML = '<p class="empty-note">Couldn\'t load items.</p>'
+        return
+      }
+      if (!data.length) {
+        list.innerHTML = '<p class="empty-note">No items yet — add one above.</p>'
+        return
+      }
+      list.innerHTML = data.map(item => `
+        <div class="item-row" data-id="${item.id}">
+          <span>
+            ${escapeHtml(item.name)}
+            <span class="item-row__meta">${item.section === 'fridge' ? 'Fridge' : 'Shelf'}${item.category ? ' · ' + escapeHtml(item.category) : ''}</span>
+          </span>
+          <span class="item-row__actions">
+            <button class="edit">Edit</button>
+            <button class="delete">Delete</button>
+          </span>
+        </div>
+      `).join('')
+
+      list.querySelectorAll('.item-row').forEach(row => {
+        const id = row.getAttribute('data-id')
+        const item = data.find(d => String(d.id) === id)
+        row.querySelector('.edit').addEventListener('click', () => startEdit(item))
+        row.querySelector('.delete').addEventListener('click', () => deleteItem(id))
+      })
+    }
+
+    function startEdit(item) {
+      editingId = item.id
+      document.getElementById('mi-section').value = item.section
+      document.getElementById('mi-category').value = item.category || ''
+      document.getElementById('mi-name').value = item.name
+      document.getElementById('mi-sort').value = item.sort_order ?? 0
+      document.getElementById('mi-save-btn').textContent = 'Save changes'
+      document.getElementById('mi-cancel-btn').style.display = 'inline-block'
+    }
+
+    function resetForm() {
+      editingId = null
+      document.getElementById('mi-section').value = 'fridge'
+      document.getElementById('mi-category').value = ''
+      document.getElementById('mi-name').value = ''
+      document.getElementById('mi-sort').value = 0
+      document.getElementById('mi-save-btn').textContent = 'Add item'
+      document.getElementById('mi-cancel-btn').style.display = 'none'
+    }
+
+    document.getElementById('mi-cancel-btn').addEventListener('click', resetForm)
+
+    document.getElementById('mi-save-btn').addEventListener('click', async () => {
+      const status = document.getElementById('mi-status')
+      const section = document.getElementById('mi-section').value
+      const category = document.getElementById('mi-category').value.trim() || null
+      const name = document.getElementById('mi-name').value.trim()
+      const sort_order = parseInt(document.getElementById('mi-sort').value, 10) || 0
+
+      if (!name) {
+        status.textContent = 'Name is required.'
+        return
+      }
+
+      status.textContent = 'Saving…'
+      let error
+      if (editingId) {
+        ;({ error } = await sb.from('menu_items').update({ section, category, name, sort_order }).eq('id', editingId))
+      } else {
+        ;({ error } = await sb.from('menu_items').insert({ section, category, name, sort_order }))
+      }
+
+      status.textContent = error ? 'Failed to save.' : 'Saved.'
+      if (error) console.error(error)
+      else {
+        resetForm()
+        loadMenuItems()
+      }
+      setTimeout(() => status.textContent = '', 2500)
+    })
+
+    async function deleteItem(id) {
+      if (!confirm('Delete this item?')) return
+      const { error } = await sb.from('menu_items').delete().eq('id', id)
+      if (error) console.error(error)
+      loadMenuItems()
+    }
+  </script>
+</body>
+</html>
