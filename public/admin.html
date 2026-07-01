@@ -419,6 +419,22 @@
         </div>
       </section>
 
+      <section class="admin-section">
+        <h2>Spotify</h2>
+        <p class="section-sub">Paste a link to the club's live Spotify queue/Jam when the music's on. Clear it when the session ends.</p>
+        <div class="panel">
+          <div class="field-row">
+            <div class="field">
+              <label for="sp-url">Spotify link</label>
+              <input type="url" id="sp-url" placeholder="https://open.spotify.com/..." />
+            </div>
+          </div>
+          <button class="btn" id="sp-save-btn">Save link</button>
+          <button class="btn btn--secondary" id="sp-clear-btn" type="button">Clear (no live session)</button>
+          <span class="save-status" id="sp-status"></span>
+        </div>
+      </section>
+
     </div>
   </div>
 
@@ -460,6 +476,7 @@
       loadEventForm()
       loadMenuItems()
       loadLayout()
+      loadSpotifyForm()
     }
 
     sb.auth.getSession().then(({ data: { session } }) => handleSession(session))
@@ -483,7 +500,8 @@
       drink_tracker: 'Drink Tracker',
       house_rules: 'House Rules',
       drinks_menu: 'Drinks Menu',
-      documentation: 'Documentation'
+      documentation: 'Documentation',
+      spotify: 'Spotify'
     }
     let layoutRows = []
 
@@ -533,6 +551,35 @@
       status.textContent = failed ? 'Failed to save.' : 'Saved.'
       setTimeout(() => status.textContent = '', 2500)
     }
+
+    // ── Spotify ──
+    async function loadSpotifyForm() {
+      const { data } = await sb.from('spotify_link').select('*').eq('id', 1).maybeSingle()
+      document.getElementById('sp-url').value = data?.url || ''
+    }
+
+    document.getElementById('sp-save-btn').addEventListener('click', async () => {
+      const status = document.getElementById('sp-status')
+      status.textContent = 'Saving…'
+      const { error } = await sb.from('spotify_link').update({
+        url: document.getElementById('sp-url').value.trim() || null,
+        updated_at: new Date().toISOString()
+      }).eq('id', 1)
+      status.textContent = error ? 'Failed to save.' : 'Saved.'
+      if (error) console.error(error)
+      setTimeout(() => status.textContent = '', 2500)
+    })
+
+    document.getElementById('sp-clear-btn').addEventListener('click', async () => {
+      const status = document.getElementById('sp-status')
+      status.textContent = 'Clearing…'
+      const { error } = await sb.from('spotify_link').update({
+        url: null, updated_at: new Date().toISOString()
+      }).eq('id', 1)
+      if (!error) document.getElementById('sp-url').value = ''
+      status.textContent = error ? 'Failed to clear.' : 'Cleared.'
+      setTimeout(() => status.textContent = '', 2500)
+    })
 
     // ── Next Event ──
     async function loadEventForm() {
