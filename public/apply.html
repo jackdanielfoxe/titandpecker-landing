@@ -197,7 +197,7 @@
     <p class="subtitle">Membership is by application only. We'll be in touch if you're a good fit.</p>
   </header>
 
-  <form id="application-form" action="https://formspree.io/f/xbdvavap" method="POST" accept-charset="UTF-8">
+  <form id="application-form" action="https://formspree.io/f/xbdvavap" method="POST">
 
     <div class="field">
       <label for="name">Full Name</label>
@@ -237,7 +237,6 @@
 
     <input type="hidden" name="_subject" value="New Tit & Pecker Membership Application" />
     <input type="hidden" name="_replyto" value="titandpecker@gmail.com" />
-    <input type="hidden" name="_next" value="https://titandpecker.com/thank-you" />
 
     <button type="submit" class="btn" id="submit-btn">Submit Application</button>
 
@@ -245,17 +244,36 @@
 
   </form>
 
+  <div class="success" id="success-msg">
+    <h2>Application received.</h2>
+    <p>Thank you for applying. Membership is considered carefully — we'll be in touch if you make the cut.</p>
+  </div>
+
   <script>
-    // Progressive enhancement only: disable the button so people can't double-submit
-    // while the page navigates away. No fetch, no preventDefault — the browser handles
-    // the actual POST natively, which is what makes this work reliably inside WhatsApp's
-    // and other apps' built-in browsers (fetch-based AJAX submissions can get blocked there).
     const form = document.getElementById('application-form')
     const btn = document.getElementById('submit-btn')
+    const success = document.getElementById('success-msg')
 
-    form.addEventListener('submit', () => {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault()
       btn.disabled = true
       btn.textContent = 'Sending…'
+
+      const data = new FormData(form)
+      const res = await fetch(form.action, {
+        method: 'POST',
+        body: data,
+        headers: { 'Accept': 'application/json' }
+      })
+
+      if (res.ok) {
+        form.style.display = 'none'
+        success.style.display = 'block'
+      } else {
+        btn.disabled = false
+        btn.textContent = 'Submit Application'
+        alert('Something went wrong. Please try again.')
+      }
     })
   </script>
 
