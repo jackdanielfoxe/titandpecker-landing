@@ -102,6 +102,25 @@
     .hero__btn:hover {
       background: #0e3d5a;
     }
+
+    .hero__actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .hero__btn--light {
+      margin-top: 0;
+      background: #A4D6F7;
+      color: #182B39;
+    }
+
+    .hero__btn--light:hover {
+      background: #8dc7ee;
+    }
   </style>
 </head>
 <body>
@@ -111,7 +130,10 @@
       <img src="/tp-logo.png" alt="Tit & Pecker" class="hero__logo" />
       <p class="hero__eyebrow">Welcome to the</p>
       <h1 class="hero__title">Tit &amp; Pecker</h1>
-      <a href="/apply.html" class="hero__btn">Apply to become a Member</a>
+      <div class="hero__actions">
+        <a href="/apply.html" class="hero__btn">Apply to become a Member</a>
+        <a href="/members" class="hero__btn hero__btn--light">Members Area</a>
+      </div>
     </div>
   </section>
 </body>
