@@ -302,6 +302,32 @@
       opacity: 0.5;
     }
 
+    /* Events card */
+    .bento-card--event {
+      position: relative;
+      overflow: hidden;
+      padding-top: 30px;
+    }
+
+    .bento-card--event::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 6px;
+      background: linear-gradient(90deg,
+        #B22234 0%, #B22234 33.33%,
+        #FFFFFF 33.33%, #FFFFFF 66.66%,
+        #3C3B6E 66.66%, #3C3B6E 100%);
+    }
+
+    .event-meta {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--deep-blue);
+    }
+
     .coming-soon {
       display: inline-block;
       font-size: 10px;
@@ -582,11 +608,11 @@
           </div>
         </div>
 
-        <div class="bento-card bento-card--placeholder">
-          <span class="bento-card__icon">📅</span>
-          <span class="bento-card__title">Events</span>
-          <span class="bento-card__desc">Upcoming nights, tastings, and members-only gatherings.</span>
-          <span class="coming-soon">Coming soon</span>
+        <div class="bento-card bento-card--event">
+          <span class="bento-card__icon">🎆</span>
+          <span class="bento-card__title">4th of July Party</span>
+          <p class="event-meta">📅 Thursday, 4 July &nbsp; · &nbsp; 🕕 6:00 PM</p>
+          <p class="bento-card__desc">Stars, stripes, and a night the Club is thrilled to celebrate — despite historically being on the losing side. On the menu: <strong>Brisket</strong>.</p>
         </div>
 
         <div class="bento-card">
