@@ -260,19 +260,37 @@
       btn.textContent = 'Sending…'
 
       const data = new FormData(form)
-      const res = await fetch(form.action, {
-        method: 'POST',
-        body: data,
-        headers: { 'Accept': 'application/json' }
-      })
 
-      if (res.ok) {
-        form.style.display = 'none'
-        success.style.display = 'block'
-      } else {
+      try {
+        const res = await fetch(form.action, {
+          method: 'POST',
+          body: data,
+          headers: { 'Accept': 'application/json' }
+        })
+
+        if (res.ok) {
+          form.style.display = 'none'
+          success.style.display = 'block'
+          return
+        }
+
+        let reason = ''
+        try {
+          const body = await res.json()
+          if (body?.errors?.length) reason = body.errors.map(e => e.message).join(' ')
+        } catch (_) { /* body wasn't JSON, ignore */ }
+
         btn.disabled = false
         btn.textContent = 'Submit Application'
-        alert('Something went wrong. Please try again.')
+        alert(
+          reason
+            ? `Something went wrong: ${reason}`
+            : 'Something went wrong. If you opened this link inside WhatsApp (or another app\'s built-in browser), try opening it in Safari or Chrome instead and submitting again — that fixes it for most people.'
+        )
+      } catch (err) {
+        btn.disabled = false
+        btn.textContent = 'Submit Application'
+        alert('Couldn\'t reach the server. If you opened this link inside WhatsApp or another app, try opening it in Safari or Chrome instead and submitting again.')
       }
     })
   </script>
