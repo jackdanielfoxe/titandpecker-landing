@@ -338,6 +338,15 @@
     <div class="admin-body">
 
       <section class="admin-section">
+        <h2>Bento Layout</h2>
+        <p class="section-sub">Reorder the cards shown on the members page. Top of this list = top of the page.</p>
+        <div class="panel">
+          <div class="item-list" id="layout-list"></div>
+          <span class="save-status" id="layout-status"></span>
+        </div>
+      </section>
+
+      <section class="admin-section">
         <h2>Next Event</h2>
         <p class="section-sub">This is the single event shown in the Events card on the members page. Saving overwrites whatever was there before.</p>
         <div class="panel">
@@ -450,6 +459,7 @@
       show(adminPage)
       loadEventForm()
       loadMenuItems()
+      loadLayout()
     }
 
     sb.auth.getSession().then(({ data: { session } }) => handleSession(session))
@@ -466,6 +476,63 @@
       await sb.auth.signOut()
       show(authScreen)
     })
+
+    // ── Bento Layout ──
+    const CARD_LABELS = {
+      events: 'Events',
+      drink_tracker: 'Drink Tracker',
+      house_rules: 'House Rules',
+      drinks_menu: 'Drinks Menu',
+      documentation: 'Documentation'
+    }
+    let layoutRows = []
+
+    async function loadLayout() {
+      const list = document.getElementById('layout-list')
+      const { data, error } = await sb.from('bento_layout').select('*').order('position')
+      if (error || !data || !data.length) {
+        list.innerHTML = '<p class="empty-note">Couldn\'t load layout.</p>'
+        return
+      }
+      layoutRows = data
+      renderLayout()
+    }
+
+    function renderLayout() {
+      const list = document.getElementById('layout-list')
+      list.innerHTML = layoutRows.map((row, i) => `
+        <div class="item-row" data-key="${row.card_key}">
+          <span>${CARD_LABELS[row.card_key] || row.card_key}</span>
+          <div class="item-row__actions">
+            <button data-dir="up" data-idx="${i}" ${i === 0 ? 'disabled' : ''}>↑</button>
+            <button data-dir="down" data-idx="${i}" ${i === layoutRows.length - 1 ? 'disabled' : ''}>↓</button>
+          </div>
+        </div>
+      `).join('')
+      list.querySelectorAll('button[data-dir]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const idx = Number(btn.dataset.idx)
+          const dir = btn.dataset.dir
+          const swapWith = dir === 'up' ? idx - 1 : idx + 1
+          if (swapWith < 0 || swapWith >= layoutRows.length) return
+          ;[layoutRows[idx], layoutRows[swapWith]] = [layoutRows[swapWith], layoutRows[idx]]
+          renderLayout()
+          saveLayout()
+        })
+      })
+    }
+
+    async function saveLayout() {
+      const status = document.getElementById('layout-status')
+      status.textContent = 'Saving…'
+      const updates = layoutRows.map((row, i) =>
+        sb.from('bento_layout').update({ position: i + 1 }).eq('card_key', row.card_key)
+      )
+      const results = await Promise.all(updates)
+      const failed = results.some(r => r.error)
+      status.textContent = failed ? 'Failed to save.' : 'Saved.'
+      setTimeout(() => status.textContent = '', 2500)
+    }
 
     // ── Next Event ──
     async function loadEventForm() {

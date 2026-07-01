@@ -304,26 +304,8 @@
 
     /* Events card */
     .bento-card--event {
-      position: relative;
-      overflow: hidden;
-      padding-top: 30px;
-    }
-
-    .bento-card--event::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 6px;
-      background: linear-gradient(90deg, var(--tan) 0%, var(--deep-blue) 100%);
-    }
-
-    .bento-card--event[data-theme="usa"]::before {
-      background: linear-gradient(90deg,
-        #B22234 0%, #B22234 33.33%,
-        #FFFFFF 33.33%, #FFFFFF 66.66%,
-        #3C3B6E 66.66%, #3C3B6E 100%);
+      background: var(--sky);
+      border-color: var(--sky);
     }
 
     .event-meta {
@@ -331,6 +313,25 @@
       font-weight: 600;
       color: var(--deep-blue);
     }
+
+    .calendar-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      align-self: flex-start;
+      margin-top: 4px;
+      padding: 8px 14px;
+      background: rgba(255,255,255,0.55);
+      border: 1px solid rgba(255,255,255,0.8);
+      border-radius: 8px;
+      text-decoration: none;
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 600;
+      transition: background 0.15s ease;
+    }
+
+    .calendar-btn:hover { background: rgba(255,255,255,0.85); }
 
     .coming-soon {
       display: inline-block;
@@ -545,16 +546,23 @@
 
       <div class="divider"></div>
 
-      <div class="bento-grid">
+      <div class="bento-grid" id="bento-grid">
 
-        <a href="https://drink.titandpecker.com" class="bento-card bento-card--featured bento-card--wide">
+        <div class="bento-card bento-card--placeholder bento-card--wide" id="event-card" data-card="events" style="order:1;">
+          <span class="bento-card__icon">📅</span>
+          <span class="bento-card__title">Events</span>
+          <span class="bento-card__desc">Upcoming nights, tastings, and members-only gatherings.</span>
+          <span class="coming-soon">Coming soon</span>
+        </div>
+
+        <a href="https://drink.titandpecker.com" class="bento-card bento-card--featured bento-card--wide" data-card="drink_tracker" style="order:2;">
           <span class="bento-card__icon">🍻</span>
           <span class="bento-card__title">Drink Tracker</span>
           <span class="bento-card__desc">Log your drinks, track your sessions, and see who's leading the leaderboard.</span>
           <span class="bento-card__arrow">Open →</span>
         </a>
 
-        <div class="bento-card">
+        <div class="bento-card" data-card="house_rules" style="order:3;">
           <span class="bento-card__icon">📜</span>
           <span class="bento-card__title">House Rules</span>
           <ol class="rules-list">
@@ -573,7 +581,7 @@
           </ol>
         </div>
 
-        <div class="bento-card bento-card--wide bento-card--menu">
+        <div class="bento-card bento-card--wide bento-card--menu" data-card="drinks_menu" style="order:4;">
           <span class="bento-card__icon">🍷</span>
           <span class="bento-card__title">Drinks Menu</span>
           <div class="menu-columns">
@@ -588,14 +596,7 @@
           </div>
         </div>
 
-        <div class="bento-card bento-card--placeholder" id="event-card">
-          <span class="bento-card__icon">📅</span>
-          <span class="bento-card__title">Events</span>
-          <span class="bento-card__desc">Upcoming nights, tastings, and members-only gatherings.</span>
-          <span class="coming-soon">Coming soon</span>
-        </div>
-
-        <div class="bento-card">
+        <div class="bento-card" data-card="documentation" style="order:5;">
           <span class="bento-card__icon">📄</span>
           <span class="bento-card__title">Documentation</span>
           <div class="doc-buttons">
@@ -668,6 +669,7 @@
       show(membersPage)
       loadMenu()
       loadNextEvent()
+      applyLayout()
     }
 
     function escapeHtml(str) {
@@ -716,12 +718,59 @@
         : '<p class="bento-card__desc" style="color:rgba(255,255,255,0.5)">Nothing on the shelf yet.</p>'
     }
 
+    // Parses free-text times like "6:00 PM", "18:00", "6pm" into { hours, minutes } 24h, or null.
+    function parseTimeString(str) {
+      if (!str) return null
+      const match = str.trim().match(/^(\d{1,2})(?::(\d{2}))?\s*(am|pm)?$/i)
+      if (!match) return null
+      let hours = parseInt(match[1], 10)
+      const minutes = match[2] ? parseInt(match[2], 10) : 0
+      const meridiem = match[3] ? match[3].toLowerCase() : null
+      if (meridiem === 'pm' && hours < 12) hours += 12
+      if (meridiem === 'am' && hours === 12) hours = 0
+      if (hours > 23 || minutes > 59) return null
+      return { hours, minutes }
+    }
+
+    function pad(n) { return String(n).padStart(2, '0') }
+
+    function buildIcsDataUri(event) {
+      const time = parseTimeString(event.start_time) || { hours: 19, minutes: 0 }
+      const [y, m, d] = event.event_date.split('-').map(Number)
+      const start = new Date(y, m - 1, d, time.hours, time.minutes)
+      const end = new Date(start.getTime() + 3 * 60 * 60 * 1000) // default 3hr duration
+
+      const fmt = dt => `${dt.getFullYear()}${pad(dt.getMonth() + 1)}${pad(dt.getDate())}T${pad(dt.getHours())}${pad(dt.getMinutes())}00`
+
+      const descParts = []
+      if (event.description) descParts.push(event.description)
+      if (event.menu_note) descParts.push(`On the menu: ${event.menu_note}`)
+
+      const ics = [
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//Tit & Pecker//Members//EN',
+        'BEGIN:VEVENT',
+        `UID:${Date.now()}@titandpecker.com`,
+        `DTSTAMP:${fmt(new Date())}`,
+        `DTSTART:${fmt(start)}`,
+        `DTEND:${fmt(end)}`,
+        `SUMMARY:${event.title}`,
+        `DESCRIPTION:${descParts.join(' — ').replace(/\n/g, '\\n')}`,
+        'LOCATION:Tit & Pecker',
+        'END:VEVENT',
+        'END:VCALENDAR'
+      ].join('\r\n')
+
+      return 'data:text/calendar;charset=utf8,' + encodeURIComponent(ics)
+    }
+
     async function loadNextEvent() {
       const eventCard = document.getElementById('event-card')
       const { data } = await sb.from('next_event').select('*').eq('id', 1).maybeSingle()
 
       if (!data || !data.title) {
-        eventCard.className = 'bento-card bento-card--placeholder'
+        eventCard.className = 'bento-card bento-card--placeholder bento-card--wide'
         eventCard.innerHTML = `
           <span class="bento-card__icon">📅</span>
           <span class="bento-card__title">Events</span>
@@ -731,9 +780,7 @@
         return
       }
 
-      const isUsaThemed = /4th of july|independence day/i.test(data.title)
-      eventCard.className = 'bento-card bento-card--event'
-      if (isUsaThemed) eventCard.setAttribute('data-theme', 'usa')
+      eventCard.className = 'bento-card bento-card--event bento-card--wide'
 
       const dateStr = data.event_date
         ? new Date(data.event_date + 'T00:00:00').toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })
@@ -742,12 +789,26 @@
       if (dateStr) metaParts.push(`📅 ${dateStr}`)
       if (data.start_time) metaParts.push(`🕕 ${escapeHtml(data.start_time)}`)
 
+      const calendarLink = data.event_date
+        ? `<a class="calendar-btn" href="${buildIcsDataUri(data)}" download="event.ics">📆 Add to Calendar</a>`
+        : ''
+
       eventCard.innerHTML = `
-        <span class="bento-card__icon">${isUsaThemed ? '🎆' : '🎉'}</span>
+        <span class="bento-card__icon">🎉</span>
         <span class="bento-card__title">${escapeHtml(data.title)}</span>
         ${metaParts.length ? `<p class="event-meta">${metaParts.join(' &nbsp;·&nbsp; ')}</p>` : ''}
         <p class="bento-card__desc">${escapeHtml(data.description || '')}${data.menu_note ? ` On the menu: <strong>${escapeHtml(data.menu_note)}</strong>.` : ''}</p>
+        ${calendarLink}
       `
+    }
+
+    async function applyLayout() {
+      const { data, error } = await sb.from('bento_layout').select('*')
+      if (error || !data) return
+      data.forEach(row => {
+        const el = document.querySelector(`[data-card="${row.card_key}"]`)
+        if (el) el.style.order = row.position
+      })
     }
 
     // Initial session check
