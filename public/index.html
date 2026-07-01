@@ -84,7 +84,9 @@
     }
 
     .hero__btn {
-      display: inline-block;
+      display: block;
+      width: 320px;
+      max-width: 100%;
       margin-top: 16px;
       padding: 18px 40px;
       background: #135178;
@@ -94,9 +96,11 @@
       font-weight: 400;
       letter-spacing: 0.02em;
       text-decoration: none;
+      text-align: center;
       border: none;
       cursor: pointer;
       transition: background 0.2s ease;
+      box-sizing: border-box;
     }
 
     .hero__btn:hover {
@@ -105,9 +109,8 @@
 
     .hero__actions {
       display: flex;
-      flex-wrap: wrap;
+      flex-direction: column;
       align-items: center;
-      justify-content: center;
       gap: 12px;
       margin-top: 16px;
     }
