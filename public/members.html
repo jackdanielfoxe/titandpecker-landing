@@ -181,11 +181,6 @@
       gap: 16px;
     }
 
-    .members-header__user {
-      font-size: 13px;
-      color: rgba(255,255,255,0.5);
-    }
-
     .signout-btn {
       background: none;
       border: 1px solid rgba(255,255,255,0.2);
@@ -369,11 +364,37 @@
     }
 
     /* Drinks menu card */
+    .bento-card--menu {
+      background: var(--ink);
+      border-color: var(--ink);
+      color: #fff;
+    }
+
+    .bento-card--menu .bento-card__title { color: #fff; }
+
     .menu-columns {
       display: grid;
       grid-template-columns: 2fr 1fr;
-      gap: 24px;
-      margin-top: 4px;
+      gap: 28px;
+      margin-top: 8px;
+    }
+
+    .menu-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .menu-group__label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Big Caslon', Georgia, serif;
+      font-size: 18px;
+      font-weight: 400;
+      color: var(--tan);
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.15);
     }
 
     .menu-category {
@@ -383,30 +404,27 @@
     .menu-category:last-child { margin-bottom: 0; }
 
     .menu-category__label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
       font-size: 11px;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      color: var(--tan);
-      margin-bottom: 6px;
+      color: rgba(255,255,255,0.5);
+      margin-bottom: 8px;
     }
 
     .menu-category ul {
       list-style: none;
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 5px;
     }
 
     .menu-category li {
       font-size: 14px;
-    }
-
-    .menu-group__label {
-      font-family: 'Big Caslon', Georgia, serif;
-      font-size: 16px;
-      font-weight: 400;
-      margin-bottom: 10px;
+      color: rgba(255,255,255,0.92);
     }
 
     /* Documentation card */
@@ -483,7 +501,6 @@
         <span class="members-header__name">Tit &amp; Pecker</span>
       </div>
       <div class="members-header__right">
-        <span class="members-header__user" id="user-email"></span>
         <button class="signout-btn" id="signout-btn">Sign out</button>
       </div>
     </header>
@@ -525,21 +542,21 @@
           </ol>
         </div>
 
-        <div class="bento-card bento-card--wide">
+        <div class="bento-card bento-card--wide bento-card--menu">
           <span class="bento-card__icon">🍷</span>
           <span class="bento-card__title">Drinks Menu</span>
           <div class="menu-columns">
-            <div>
-              <p class="menu-group__label">In the Fridge</p>
+            <div class="menu-group">
+              <p class="menu-group__label">❄️ In the Fridge</p>
               <div class="menu-category">
-                <p class="menu-category__label">Bottles</p>
+                <p class="menu-category__label">🍾 Bottles</p>
                 <ul>
                   <li>Estrella</li>
                   <li>Staropramen</li>
                 </ul>
               </div>
               <div class="menu-category">
-                <p class="menu-category__label">Cans</p>
+                <p class="menu-category__label">🥫 Cans</p>
                 <ul>
                   <li>White Claw Black Cherry</li>
                   <li>White Claw Raspberry</li>
@@ -547,15 +564,15 @@
                 </ul>
               </div>
               <div class="menu-category">
-                <p class="menu-category__label">Soft Drinks</p>
+                <p class="menu-category__label">🥤 Soft Drinks</p>
                 <ul>
                   <li>Coke</li>
                   <li>Schweppes Slimline Tonic</li>
                 </ul>
               </div>
             </div>
-            <div>
-              <p class="menu-group__label">On the Shelf</p>
+            <div class="menu-group">
+              <p class="menu-group__label">🗄️ On the Shelf</p>
               <div class="menu-category">
                 <ul>
                   <li>Gordon's Gin</li>
@@ -596,7 +613,6 @@
     const authScreen = document.getElementById('auth-screen')
     const denied     = document.getElementById('denied')
     const membersPage = document.getElementById('members-page')
-    const userEmail  = document.getElementById('user-email')
     const welcomeName = document.getElementById('welcome-name')
 
     function show(el) {
@@ -640,7 +656,6 @@
         return
       }
 
-      userEmail.textContent = email
       welcomeName.textContent = `Good to see you, ${name.split(' ')[0]}.`
       show(membersPage)
     }
